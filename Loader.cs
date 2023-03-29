@@ -11,6 +11,7 @@ namespace HogWarp.Lib
         [DllImport("kernel32.dll", CharSet = CharSet.Ansi, ExactSpelling = true)]
         static public extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
 
+
         [StructLayout(LayoutKind.Sequential)]
         public struct InitArgs
         {
@@ -51,7 +52,6 @@ namespace HogWarp.Lib
         [UnmanagedCallersOnly]
         public static void Initialize(InitArgs args)
         {
-            Console.WriteLine("Initialize");
             var module = LoadLibrary("HogWarpServer.exe");
             if (module == 0)
             {
