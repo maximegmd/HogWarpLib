@@ -60,7 +60,7 @@ namespace HogWarp.Generator
                 builder.AppendLine($"namespace {ns}");
                 builder.AppendLine("{");
                 builder.IncrementIndent();
-                builder.AppendLine($"public partial class {klassName}");
+                builder.AppendLine($"public unsafe partial class {klassName}");
                 builder.AppendLine("{");
                 builder.IncrementIndent();
 
@@ -112,7 +112,7 @@ namespace HogWarp.Generator
                     if (!f.ReturnsVoid)
                         funcCall = "return ";
 
-                    funcCall += $"{f.Name}Internal(Address";
+                    funcCall += $"{f.Name}Internal((IntPtr)Address";
 
                     bool first = true;
                     foreach (var p in f.Parameters)

@@ -2,16 +2,14 @@
 
 namespace HogWarp.Lib.Game
 {
-    public partial class Player
+    public partial class Player : Character
     {
-        private IntPtr Address;
-
         [Function]
         public partial void Kick();
 
         public Player(IntPtr Address)
+            : base(Address)
         {
-            this.Address = Address;
         }
     }
 }
