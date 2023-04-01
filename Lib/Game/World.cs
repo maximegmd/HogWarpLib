@@ -7,20 +7,11 @@ namespace HogWarp.Lib.Game
         [StructLayout(LayoutKind.Explicit)]
         public struct Internal
         {
-            [FieldOffset(0)]
-            public double GameTime;
-
-            [FieldOffset(8)]
-            public ESeason Season;
-
-            [FieldOffset(12)]
-            public int Day;
-
-            [FieldOffset(16)]
-            public int Month;
-
-            [FieldOffset(20)]
-            public int Year;
+            [FieldOffset(0)] public double GameTime;
+            [FieldOffset(8)] public ESeason Season;
+            [FieldOffset(12)] public int Day;
+            [FieldOffset(16)] public int Month;
+            [FieldOffset(20)] public int Year;
         }
 
         public Internal* Address;
