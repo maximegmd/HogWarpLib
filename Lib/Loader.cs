@@ -5,19 +5,14 @@ namespace HogWarp.Lib
 {
     public static class Loader
     {
-        [DllImport("kernel32.dll", SetLastError = true)]
-        static extern IntPtr LoadLibrary(string lpFileName);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Ansi, ExactSpelling = true)]
-        static public extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
-
-
         [StructLayout(LayoutKind.Sequential)]
-        public struct InitArgs
+        public struct InitializationParameters
         {
-            public IntPtr World;
+            internal IntPtr WorldAddress;
+            internal World.InitializationVariableParameters WorldVariableParameters;
+            internal Player.InitializationFunctionParameters PlayerFunctionParameters;
         }
-
+        
         [StructLayout(LayoutKind.Sequential)]
         public struct ShutdownArgs
         {
@@ -50,20 +45,12 @@ namespace HogWarp.Lib
         }
 
         [UnmanagedCallersOnly]
-        public static void Initialize(InitArgs args)
+        public static void Initialize(InitializationParameters Params)
         {
-            var module = LoadLibrary("HogWarpServer.exe");
-            if (module == 0)
-            {
-                module = LoadLibrary("HogWarpServer");
-                if (module == 0)
-                    return;
-            }
-            
-            Player.Initialize(module);
-            World.Initialize(module);
+            World.Initialize(Params.WorldVariableParameters);
+            Player.Initialize(Params.PlayerFunctionParameters);
 
-            Server.World = new World(args.World);
+            Server.World = new World(Params.WorldAddress);
         }
 
         [UnmanagedCallersOnly]
