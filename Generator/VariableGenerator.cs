@@ -63,15 +63,6 @@ namespace HogWarp.Generator
                 builder.AppendLine("{");
                 builder.IncrementIndent();
 
-                builder.AppendLine("internal IntPtr Address;");
-                builder.AppendLine("");
-
-                builder.AppendLine($"public {klassName}(IntPtr Address)");
-                builder.AppendLine("{");
-                builder.IncrementIndent();
-                builder.AppendLine("this.Address = Address;");
-                builder.DecrementIndent();
-                builder.AppendLine("}");
                 builder.AppendLine("");
 
                 builder.AppendLine("#pragma warning disable CS0649");
@@ -124,9 +115,9 @@ namespace HogWarp.Generator
                     builder.IncrementIndent();
 
                     if (!v.GetMethod.IsNull())
-                        builder.AppendLine("get { return Get" + v.Name + "(Address); }");
+                        builder.AppendLine("get { return Get" + v.Name + "((IntPtr)Address); }");
                     if (!v.SetMethod.IsNull())
-                        builder.AppendLine("set { Set" + v.Name + "(Address, value); }");
+                        builder.AppendLine("set { Set" + v.Name + "((IntPtr)Address, value); }");
 
                     builder.DecrementIndent();
                     builder.AppendLine("}");

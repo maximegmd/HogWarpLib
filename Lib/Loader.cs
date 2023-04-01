@@ -9,7 +9,6 @@ namespace HogWarp.Lib
         public struct InitializationParameters
         {
             internal IntPtr WorldAddress;
-            internal World.InitializationVariableParameters WorldVariableParameters;
             internal Player.InitializationFunctionParameters PlayerFunctionParameters;
         }
         
@@ -47,7 +46,6 @@ namespace HogWarp.Lib
         [UnmanagedCallersOnly]
         public static void Initialize(InitializationParameters Params)
         {
-            World.Initialize(Params.WorldVariableParameters);
             Player.Initialize(Params.PlayerFunctionParameters);
 
             Server.World = new World(Params.WorldAddress);

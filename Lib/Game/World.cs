@@ -1,28 +1,49 @@
-﻿using HogWarp.Lib.Interop.Attributes;
+﻿using System.Runtime.InteropServices;
 
 namespace HogWarp.Lib.Game
 {
-    public partial class World
+    public unsafe partial class World
     {
-        internal sealed class Metadata
+        [StructLayout(LayoutKind.Explicit)]
+        public struct Internal
         {
-            [Variable]
-            public int Day { get; }
+            [FieldOffset(0)]
+            public double GameTime;
 
-            [Variable]
-            public int Hour { get; }
+            [FieldOffset(8)]
+            public ESeason Season;
 
-            [Variable]
-            public int Minute { get; }
+            [FieldOffset(12)]
+            public int Day;
 
-            [Variable]
-            public int Season { get; }
+            [FieldOffset(16)]
+            public int Month;
 
-            [Variable]
-            public int Month { get; }
+            [FieldOffset(20)]
+            public int Year;
+        }
 
-            [Variable]
-            public int Year { get; }
+        public Internal* Address;
+
+        public double GameTime { get { return Address->GameTime; } set { Address->GameTime = value; } }
+        public ESeason Season { get { return Address->Season; } set { Address->Season = value; } }
+        public int Day { get { return Address->Day; } set { Address->Day = value; } }
+        public int Month { get { return Address->Month; } set { Address->Month = value; } }
+        public int Year { get { return Address->Year; } set { Address->Year = value; } }
+
+        public World(IntPtr Address)
+        {
+            this.Address = (Internal*)Address;
+        }
+
+        public enum ESeason : int
+        {
+            INVALID = 0,
+            FALL = 1,
+            WINTER = 2,
+            SPRING = 3,
+            SUMMER = 4,
+            MAX = 5
         }
     }
 }
