@@ -8,11 +8,11 @@ namespace HogWarp.Lib.Game
         public struct Internal
         {
             [FieldOffset(8)] public uint Id;
+            [FieldOffset(12)] public HouseIds HouseId;
+            [FieldOffset(13)] public EGenderEnum Gender;
+            [FieldOffset(14)] public bool Hooded;
+            [FieldOffset(15)] public bool Mounted;
             [FieldOffset(16)] public TimePoint LastMovement;
-            [FieldOffset(48)] public HouseIds HouseId;
-            [FieldOffset(49)] public EGenderEnum Gender;
-            [FieldOffset(50)] public bool Hooded;
-            [FieldOffset(51)] public bool Mounted;
         }
 
         public enum EGenderEnum : byte
