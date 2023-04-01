@@ -1,7 +1,6 @@
-﻿using HogWarp.Lib.Game.Data;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
-namespace HogWarp.Lib.Game
+namespace HogWarp.Lib.Game.Data
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct TimePoint

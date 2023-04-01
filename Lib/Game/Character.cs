@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using HogWarp.Lib.Game.Data;
 
 namespace HogWarp.Lib.Game
 {
