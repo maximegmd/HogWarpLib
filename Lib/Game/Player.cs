@@ -4,7 +4,7 @@ namespace HogWarp.Lib.Game
 {
     public partial class Player
     {
-        public IntPtr Address;
+        private IntPtr Address;
 
         [Function]
         public partial void Kick();
