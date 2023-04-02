@@ -63,7 +63,7 @@ namespace HogWarp.Lib.System
 
         public BufferReader(Buffer buffer)
         {
-            // Keep of ref counting
+            // Keep for ref counting
             _buffer = buffer;
 
             _internal.Buffer = _buffer.Address;

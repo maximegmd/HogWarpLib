@@ -34,9 +34,17 @@ namespace HogWarp.Lib.System
             freeDelegate = (FreeDelegate)Marshal.GetDelegateForFunctionPointer(parameters.Free, typeof(FreeDelegate));
         }
 
-        public Buffer(IntPtr address)
+        private Buffer()
         {
-            Address = (Internal*)address;
+
+        }
+
+        public static Buffer FromAddress(IntPtr address)
+        {
+            var buffer = new Buffer();
+            buffer.Address = (Internal*)address;
+
+            return buffer;
         }
 
         public Buffer(ulong size)

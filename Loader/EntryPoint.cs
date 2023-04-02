@@ -68,7 +68,7 @@ namespace HogWarp.Loader
         {
             string modName = Marshal.PtrToStringUTF8(args.Plugin)!;
 
-            var buffer = new Lib.System.Buffer(args.Message);
+            var buffer = Lib.System.Buffer.FromAddress(args.Message);
             var msg = new ClientMessage(new Player(args.Ptr), buffer, args.Opcode);
 
             EventProcessor<ClientMessage>.DispatchTo(modName, msg);
