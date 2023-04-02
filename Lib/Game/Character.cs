@@ -35,7 +35,7 @@ namespace HogWarp.Lib.Game
             MAX = 6
         };
 
-        protected Internal* Address;
+        public Internal* Address;
 
         public Character(IntPtr Address)
         {

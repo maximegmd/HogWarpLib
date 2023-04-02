@@ -1,6 +1,7 @@
 ﻿using HogWarp.Lib;
 using HogWarp.Lib.Events;
 using HogWarp.Lib.System;
+using Buffer = HogWarp.Lib.System.Buffer;
 
 namespace Sample
 {
@@ -34,7 +35,13 @@ namespace Sample
             Console.WriteLine($"Received packet with opcode {clientMessage.Opcode}");
             if(clientMessage.Opcode == 42)
             {
-                Console.WriteLine($"Ping: {reader.ReadVarInt()}");
+                var ping = reader.ReadVarInt();
+
+                var buffer = new Buffer(1000);
+                var writer = new BufferWriter(buffer);
+                writer.WriteVarInt(ping + 1);
+
+
             }
         }
     }

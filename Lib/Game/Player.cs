@@ -2,7 +2,7 @@
 
 namespace HogWarp.Lib.Game
 {
-    public partial class Player : Character
+    public unsafe partial class Player : Character
     {
         [Function]
         public partial void Kick();

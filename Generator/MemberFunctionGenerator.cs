@@ -85,7 +85,12 @@ namespace HogWarp.Generator
 
                     foreach(var p in f.Parameters)
                     {
-                        func += ", " + p.OriginalDefinition.Name + " " + p.Name;
+                        func += ", ";
+
+                        if (p.Type.Name == "String")
+                            func += "[MarshalAs(UnmanagedType.LPUTF8Str)] ";
+
+                        func += p.Type.Name + " " + p.Name;
                     }
                     func = func + ");";
 

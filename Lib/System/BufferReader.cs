@@ -1,5 +1,5 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+using System.Text;
 
 namespace HogWarp.Lib.System
 {
@@ -27,10 +27,10 @@ namespace HogWarp.Lib.System
         private Buffer _buffer;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        delegate bool ReadBytesDelegate([In, Out][MarshalAs(UnmanagedType.LPArray)] byte[] data, ulong length);
+        delegate bool ReadBytesDelegate(Internal* buffer, [In, Out][MarshalAs(UnmanagedType.LPArray)] byte[] data, ulong length);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        delegate bool ReadBitsDelegate(out ulong value, ulong length);
+        delegate bool ReadBitsDelegate(Internal* buffer, out ulong value, ulong length);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         delegate bool ReadBoolDelegate(Internal* buffer);
@@ -50,7 +50,6 @@ namespace HogWarp.Lib.System
         static ReadFloatDelegate? readFloatDelegate;
         static ReadVarIntDelegate? readVarIntDelegate;
         static ReadDoubleDelegate? readDoubleDelegate;
-
 
         public static void Initialize(Parameters bufferParameters)
         {
@@ -73,44 +72,47 @@ namespace HogWarp.Lib.System
 
         public bool ReadBits(out ulong value, ulong length)
         {
-            return readBitsDelegate!(out value, length);
+            fixed (Internal* ptr = &_internal)
+                return readBitsDelegate!(ptr, out value, length);
         }
 
-        public bool ReadBytes(byte[] data, ulong length)
+        public bool ReadBytes(byte[] data)
         {
-            return readBytesDelegate!(data, length);
+            fixed (Internal* ptr = &_internal)
+                return readBytesDelegate!(ptr, data, (ulong)data.LongLength);
         }
 
         public bool ReadBool()
         {
             fixed (Internal* ptr = &_internal)
-            {
                 return readBoolDelegate!(ptr);
-            }
         }
 
         public float ReadFloat()
         {
             fixed (Internal* ptr = &_internal)
-            {
                 return readFloatDelegate!(ptr);
-            }
         }
 
         public ulong ReadVarInt()
         {
             fixed (Internal* ptr = &_internal)
-            {
                 return readVarIntDelegate!(ptr);
-            }
         }
 
         public double ReadDouble()
         {
             fixed (Internal* ptr = &_internal)
-            {
                 return readDoubleDelegate!(ptr);
-            }
+        }
+
+        public string ReadString()
+        {
+            var length = ReadVarInt() & 0xFFFF;
+            var data = new byte[length];
+            ReadBytes(data);
+
+            return Encoding.UTF8.GetString(data, 0, data.Length);
         }
     }
 }

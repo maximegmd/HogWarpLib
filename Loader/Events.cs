@@ -1,6 +1,7 @@
 ﻿using HogWarp.Lib.Game;
 using HogWarp.Lib.System;
 using System.Runtime.InteropServices;
+using Buffer = HogWarp.Lib.System.Buffer;
 
 namespace HogWarp.Loader
 {
@@ -10,8 +11,12 @@ namespace HogWarp.Loader
         public struct InitializationParameters
         {
             internal IntPtr WorldAddress;
+            internal IntPtr PlayerManagerAddress;
             internal Player.InitializationFunctionParameters PlayerFunctionParameters;
+            internal Buffer.Parameters BufferParameters;
             internal BufferReader.Parameters ReaderParameters;
+            internal BufferWriter.Parameters WriterParameters;
+            internal PlayerManager.InitializationFunctionParameters PlayerManagerParameters;
         }
 
         [StructLayout(LayoutKind.Sequential)]

@@ -16,10 +16,15 @@ namespace HogWarp.Loader
         public static void Initialize(InitializationParameters Params)
         {
             Player.Initialize(Params.PlayerFunctionParameters);
+            Lib.System.Buffer.Initialize(Params.BufferParameters);
             BufferReader.Initialize(Params.ReaderParameters);
+            BufferWriter.Initialize(Params.WriterParameters);
+            PlayerManager.Initialize(Params.PlayerManagerParameters);
 
             var world = new World(Params.WorldAddress);
-            _server = new Server(world);
+            var playerManager = new PlayerManager(Params.PlayerManagerAddress);
+
+            _server = new Server(world, playerManager);
 
             LoadFromBase("plugins");
 
@@ -64,7 +69,7 @@ namespace HogWarp.Loader
             string modName = Marshal.PtrToStringUTF8(args.Plugin)!;
 
             var buffer = new Lib.System.Buffer(args.Message);
-            var msg = new Lib.Events.ClientMessage(new Player(args.Ptr), buffer, args.Opcode);
+            var msg = new ClientMessage(new Player(args.Ptr), buffer, args.Opcode);
 
             EventProcessor<ClientMessage>.DispatchTo(modName, msg);
         }
