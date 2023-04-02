@@ -66,7 +66,7 @@ namespace HogWarp.Generator
 
                 builder.AppendLine("#pragma warning disable CS0649");
                 builder.AppendLine("[StructLayout(LayoutKind.Sequential)]");
-                builder.AppendLine($"internal struct InitializationFunctionParameters");
+                builder.AppendLine("public struct InitializationFunctionParameters");
                 builder.AppendLine("{");
                 builder.IncrementIndent();
                 foreach (var f in data.Functions)
@@ -94,7 +94,7 @@ namespace HogWarp.Generator
                     builder.AppendLine("");
                 }
 
-                builder.AppendLine($"internal static void Initialize(InitializationFunctionParameters Params)");
+                builder.AppendLine($"public static void Initialize(InitializationFunctionParameters Params)");
                 builder.AppendLine("{");
                 builder.IncrementIndent();
                 foreach (var f in data.Functions)
