@@ -83,17 +83,5 @@ namespace HogWarp.Loader
                     $"Can't find any type which implements IPluginBase in {assembly} from {assembly.Location}.");
             }
         }
-
-        public static void Dispatch<T>(T serverEvent)
-        {
-            try
-            {
-                EventProcessor<T>.Dispatch(serverEvent);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-        }
     }
 }

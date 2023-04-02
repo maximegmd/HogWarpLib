@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using static HogWarp.Loader.PluginManager;
 using static HogWarp.Loader.Events;
 using HogWarp.Lib;
+using HogWarp.Lib.System;
 
 namespace HogWarp.Loader
 {
@@ -15,6 +16,7 @@ namespace HogWarp.Loader
         public static void Initialize(InitializationParameters Params)
         {
             Player.Initialize(Params.PlayerFunctionParameters);
+            BufferReader.Initialize(Params.ReaderParameters);
 
             var world = new World(Params.WorldAddress);
             _server = new Server(world);
@@ -27,37 +29,44 @@ namespace HogWarp.Loader
         [UnmanagedCallersOnly]
         public static void Shutdown(ShutdownArgs args)
         {
-            Dispatch(new Shutdown());
+            EventProcessor<Shutdown>.Dispatch(new Shutdown());
         }
 
         [UnmanagedCallersOnly]
         public static void Update(UpdateArgs args)
         {
-            Dispatch(new Update(args.Delta));
+            EventProcessor<Update>.Dispatch(new Update(args.Delta));
         }
 
         [UnmanagedCallersOnly]
         public static void OnPlayerJoined(PlayerArgs args)
         {
-            Dispatch(new PlayerJoin(new Player(args.Ptr)));
+            EventProcessor<PlayerJoin>.Dispatch(new PlayerJoin(new Player(args.Ptr)));
         }
 
         [UnmanagedCallersOnly]
         public static void OnPlayerLeft(PlayerArgs args)
         {
-            Dispatch(new PlayerLeave(new Player(args.Ptr)));
+            EventProcessor<PlayerLeave>.Dispatch(new PlayerLeave(new Player(args.Ptr)));
         }
 
         [UnmanagedCallersOnly]
-        public static void OnPlayerChat(ChatArgs args)
+        public static int OnPlayerChat(ChatArgs args)
         {
-            Console.WriteLine("Chat");
+            string message = Marshal.PtrToStringUTF8(args.Message)!;
+
+            return EventProcessor<Chat>.DispatchCancellable(new Chat(new Player(args.Ptr), message)) ? 1 : 0;
         }
 
         [UnmanagedCallersOnly]
         public static void OnMessage(MessageArgs args)
         {
-            Console.WriteLine("Message");
+            string modName = Marshal.PtrToStringUTF8(args.Plugin)!;
+
+            var buffer = new Lib.System.Buffer(args.Message);
+            var msg = new Lib.Events.ClientMessage(new Player(args.Ptr), buffer, args.Opcode);
+
+            EventProcessor<ClientMessage>.DispatchTo(modName, msg);
         }
     }
 }

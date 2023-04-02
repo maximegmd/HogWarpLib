@@ -1,4 +1,5 @@
 ﻿using HogWarp.Lib.Game;
+using HogWarp.Lib.System;
 using System.Runtime.InteropServices;
 
 namespace HogWarp.Loader
@@ -10,6 +11,7 @@ namespace HogWarp.Loader
         {
             internal IntPtr WorldAddress;
             internal Player.InitializationFunctionParameters PlayerFunctionParameters;
+            internal BufferReader.Parameters ReaderParameters;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -40,7 +42,9 @@ namespace HogWarp.Loader
         public struct MessageArgs
         {
             public IntPtr Ptr;
+            public IntPtr Plugin;
             public IntPtr Message;
+            public ushort Opcode;
         }
     }
 }
