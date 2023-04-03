@@ -1,5 +1,8 @@
 ﻿using HogWarp.Lib.Game;
 using Serilog;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("HogWarp.Loader")]
 
 namespace HogWarp.Lib
 {
@@ -54,33 +57,33 @@ namespace HogWarp.Lib
             }
         }
 
-        public void OnUpdate(float deltaSeconds)
+        internal void OnUpdate(float deltaSeconds)
         {
             UpdateEvent?.Invoke(deltaSeconds);
         }
 
-        public void OnShutdown()
+        internal void OnShutdown()
         {
             ShutdownEvent?.Invoke();
         }
 
-        public void OnPlayerJoin(Player player)
+        internal void OnPlayerJoin(Player player)
         {
             PlayerJoinEvent?.Invoke(player);
         }
 
-        public void OnPlayerLeave(Player player)
+        internal void OnPlayerLeave(Player player)
         {
             PlayerLeaveEvent?.Invoke(player);
         }
 
-        public void OnChat(Player player, string message, out bool cancel)
+        internal void OnChat(Player player, string message, out bool cancel)
         {
             cancel = false;
             ChatEvent?.Invoke(player, message, ref cancel);
         }
 
-        public void OnMessage(Player player, string modName, ushort opcode, Lib.System.Buffer buffer)
+        internal void OnMessage(Player player, string modName, ushort opcode, Lib.System.Buffer buffer)
         {
             if (_messageHandlers.TryGetValue(modName, out var handlers))
                 foreach (var h in handlers)
