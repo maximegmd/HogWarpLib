@@ -57,9 +57,7 @@ namespace HogWarp.Lib.System
         public void Dispose()
         {
             if (_disposable)
-            {
                 freeDelegate!(Address);
-            }
         }
     }
 }

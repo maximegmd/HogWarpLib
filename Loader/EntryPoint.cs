@@ -34,25 +34,25 @@ namespace HogWarp.Loader
         [UnmanagedCallersOnly]
         public static void Shutdown(ShutdownArgs args)
         {
-            EventProcessor<Shutdown>.Dispatch(new Shutdown());
+            _server!.OnShutdown();
         }
 
         [UnmanagedCallersOnly]
         public static void Update(UpdateArgs args)
         {
-            EventProcessor<Update>.Dispatch(new Update(args.Delta));
+            _server!.OnUpdate(args.Delta);
         }
 
         [UnmanagedCallersOnly]
         public static void OnPlayerJoined(PlayerArgs args)
         {
-            EventProcessor<PlayerJoin>.Dispatch(new PlayerJoin(new Player(args.Ptr)));
+            _server!.OnPlayerJoin(new Player(args.Ptr));
         }
 
         [UnmanagedCallersOnly]
         public static void OnPlayerLeft(PlayerArgs args)
         {
-            EventProcessor<PlayerLeave>.Dispatch(new PlayerLeave(new Player(args.Ptr)));
+            _server!.OnPlayerLeave(new Player(args.Ptr));
         }
 
         [UnmanagedCallersOnly]
@@ -60,7 +60,9 @@ namespace HogWarp.Loader
         {
             string message = Marshal.PtrToStringUTF8(args.Message)!;
 
-            return EventProcessor<Chat>.DispatchCancellable(new Chat(new Player(args.Ptr), message)) ? 1 : 0;
+            _server!.OnChat(new Player(args.Ptr), message, out var cancel);
+
+            return cancel ? 1 : 0;
         }
 
         [UnmanagedCallersOnly]
@@ -71,7 +73,7 @@ namespace HogWarp.Loader
             var buffer = Lib.System.Buffer.FromAddress(args.Message);
             var msg = new ClientMessage(new Player(args.Ptr), buffer, args.Opcode);
 
-            EventProcessor<ClientMessage>.DispatchTo(modName, msg);
+            _server!.OnMessage(new Player(args.Ptr), modName, args.Opcode, buffer);
         }
     }
 }

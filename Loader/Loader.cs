@@ -19,7 +19,7 @@ namespace HogWarp.Loader
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    Serilog.Log.Logger.Error(ex.ToString());
                 }
             }
         }
@@ -43,9 +43,11 @@ namespace HogWarp.Loader
                 }
                 catch( Exception ex ) 
                 {
-                    Console.WriteLine( ex.ToString() );
+                    Serilog.Log.Logger.Error(ex.ToString());
                 }
             }
+
+            Serilog.Log.Logger.Information($"{_plugins.Count} plugin(s) loaded.");
         }
 
         static Assembly LoadPlugin(string relativePath)
@@ -54,10 +56,10 @@ namespace HogWarp.Loader
             string root = Path.GetFullPath(Path.GetDirectoryName(typeof(EntryPoint).Assembly.Location!)!);
 
             string pluginLocation = Path.GetFullPath(Path.Combine(root, relativePath.Replace('\\', Path.DirectorySeparatorChar)));
-            Console.WriteLine($"Loading plugin from: {pluginLocation}");
+            string rel = Path.GetRelativePath(root, relativePath);
+            Serilog.Log.Logger.Information($"Loading: {rel}");
             PluginLoadContext loadContext = new PluginLoadContext(pluginLocation);
             return loadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(pluginLocation)));
-
         }
 
         static IEnumerable<IPluginBase> CreatePlugins(Assembly assembly) 
@@ -71,6 +73,7 @@ namespace HogWarp.Loader
                     IPluginBase? result = Activator.CreateInstance(type) as IPluginBase;
                     if(result != null)
                     {
+                        Serilog.Log.Logger.Information($"> Loaded {type.FullName}, '{result.Name}' - '{result.Description}'");
                         ++count;
                         yield return result!;
                     }

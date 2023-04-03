@@ -2,7 +2,6 @@
 using HogWarp.Lib.Events;
 using HogWarp.Lib.Game;
 using HogWarp.Lib.System;
-using System.Net.NetworkInformation;
 using Buffer = HogWarp.Lib.System.Buffer;
 
 namespace Sample
@@ -18,37 +17,39 @@ namespace Sample
         public void Initialize(Server server)
         {
             _server = server;
+            _server.UpdateEvent += Update;
+            _server.ChatEvent += Chat;
+            _server.PlayerJoinEvent += PlayerJoin;
+            _server.RegisterMessageHandler(Name, HandleMessage);
         }
 
-        public void ProcessEvent(Update serverEvent)
+        public void Update(float deltaSeconds)
         {
-            //Console.WriteLine($"Update! {serverEvent.DeltaSeconds}, year {_server!.World.Year}");
         }
 
-        public bool ProcessEvent(Chat serverEvent)
+        public void Chat(Player player, string message, ref bool cancel)
         {
-            Console.WriteLine($"Chat: {serverEvent.Message}");
-            return false;
+            Console.WriteLine($"Chat: {message}");
         }
 
-        public void ProcessEvent(PlayerJoin playerJoin)
+        public void PlayerJoin(Player player)
         {
             Console.WriteLine("Player joined!");
 
-            SendPing(playerJoin.Player, 0);
+            SendPing(player, 0);
         }
 
-        public void ProcessEvent(ClientMessage clientMessage)
+        public void HandleMessage(Player player, ushort opcode, Buffer buffer)
         {
-            var reader = new BufferReader(clientMessage.Message);
+            var reader = new BufferReader(buffer);
 
-            if(clientMessage.Opcode == 42)
+            if(opcode == 42)
             {
                 var ping = reader.ReadVarInt();
 
                 Console.WriteLine($"Ping: {ping}");
 
-                SendPing(clientMessage.Player, ping);
+                SendPing(player, ping);
             }
         }
 
