@@ -22,7 +22,7 @@ namespace HogWarp.Lib.Game
         public int Month { get { return Address->Month; } set { Address->Month = value; } }
         public int Year { get { return Address->Year; } set { Address->Year = value; } }
 
-        public World(IntPtr Address)
+        internal World(IntPtr Address)
         {
             this.Address = (Internal*)Address;
         }

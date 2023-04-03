@@ -1,5 +1,4 @@
 ﻿using HogWarp.Lib;
-using HogWarp.Lib.Events;
 using HogWarp.Lib.Game;
 using HogWarp.Lib.System;
 using Buffer = HogWarp.Lib.System.Buffer;

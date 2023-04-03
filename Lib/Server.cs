@@ -27,7 +27,7 @@ namespace HogWarp.Lib
 
         private Dictionary<string, HashSet<MessageDelegate>> _messageHandlers = new Dictionary<string, HashSet<MessageDelegate>>();
 
-        public Server(World world, PlayerManager playerManager)
+        internal Server(World world, PlayerManager playerManager)
         {
             Log = Serilog.Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()

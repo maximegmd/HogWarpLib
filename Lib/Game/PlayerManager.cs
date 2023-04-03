@@ -6,14 +6,14 @@ namespace HogWarp.Lib.Game
     public unsafe partial class PlayerManager
     {
         [Function]
-        public partial void SendModMessage(IntPtr player, string mod, ushort opcode, IntPtr ptr);
+        private partial void SendModMessage(IntPtr player, string mod, ushort opcode, IntPtr ptr);
 
         [Function]
-        public partial void BroadcastModMessage(string mod, ushort opcode, IntPtr ptr);
+        private partial void BroadcastModMessage(string mod, ushort opcode, IntPtr ptr);
 
         private IntPtr Address;
 
-        public PlayerManager(IntPtr address)
+        internal PlayerManager(IntPtr address)
         {
             Address = address;
         }

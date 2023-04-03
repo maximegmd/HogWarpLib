@@ -66,7 +66,7 @@ namespace HogWarp.Generator
 
                 builder.AppendLine("#pragma warning disable CS0649");
                 builder.AppendLine("[StructLayout(LayoutKind.Sequential)]");
-                builder.AppendLine("public struct InitializationFunctionParameters");
+                builder.AppendLine("internal struct InitializationFunctionParameters");
                 builder.AppendLine("{");
                 builder.IncrementIndent();
                 foreach (var f in data.Functions)
@@ -99,7 +99,7 @@ namespace HogWarp.Generator
                     builder.AppendLine("");
                 }
 
-                builder.AppendLine($"public static void Initialize(InitializationFunctionParameters Params)");
+                builder.AppendLine($"internal static void Initialize(InitializationFunctionParameters Params)");
                 builder.AppendLine("{");
                 builder.IncrementIndent();
                 foreach (var f in data.Functions)
@@ -112,7 +112,19 @@ namespace HogWarp.Generator
 
                 foreach (var f in data.Functions)
                 {
-                    var func = $"public partial {f.ReturnType.OriginalDefinition} {f.Name}(";
+                    string accessibility = "";
+                    switch(f.DeclaredAccessibility)
+                    {
+                        case Accessibility.Private:
+                            accessibility = "private"; break;
+                        case Accessibility.Protected:
+                            accessibility = "protected"; break;
+                        case Accessibility.Internal:
+                            accessibility = "internal"; break;
+                        default:
+                            accessibility = "public"; break;
+                    }
+                    var func = $"{accessibility} partial {f.ReturnType.OriginalDefinition} {f.Name}(";
                     var funcCall = "";
                     if (!f.ReturnsVoid)
                         funcCall = "return ";

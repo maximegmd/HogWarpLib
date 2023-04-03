@@ -7,7 +7,7 @@ namespace HogWarp.Lib.Game
         [Function]
         public partial void Kick();
 
-        public Player(IntPtr Address)
+        internal Player(IntPtr Address)
             : base(Address)
         {
         }

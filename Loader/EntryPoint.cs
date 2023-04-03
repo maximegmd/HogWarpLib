@@ -1,5 +1,4 @@
-﻿using HogWarp.Lib.Events;
-using HogWarp.Lib.Game;
+﻿using HogWarp.Lib.Game;
 using System.Runtime.InteropServices;
 using static HogWarp.Loader.PluginManager;
 using static HogWarp.Loader.Events;
@@ -71,7 +70,6 @@ namespace HogWarp.Loader
             string modName = Marshal.PtrToStringUTF8(args.Plugin)!;
 
             var buffer = Lib.System.Buffer.FromAddress(args.Message);
-            var msg = new ClientMessage(new Player(args.Ptr), buffer, args.Opcode);
 
             _server!.OnMessage(new Player(args.Ptr), modName, args.Opcode, buffer);
         }
