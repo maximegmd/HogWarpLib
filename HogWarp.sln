@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HogWarp.Generator", "Genera
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HogWarp.Loader", "Loader\HogWarp.Loader.csproj", "{B0641398-E97A-4A21-90F6-8EBBC0D082FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "Sample\Sample.csproj", "{BD229250-BFBB-4396-8627-7E8577B076C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample", "Sample\Sample.csproj", "{BD229250-BFBB-4396-8627-7E8577B076C2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BroomRacing", "BroomRacing\BroomRacing.csproj", "{6B4AAE9F-7291-4569-98B2-38FAB74E8B5F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{BD229250-BFBB-4396-8627-7E8577B076C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD229250-BFBB-4396-8627-7E8577B076C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD229250-BFBB-4396-8627-7E8577B076C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B4AAE9F-7291-4569-98B2-38FAB74E8B5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B4AAE9F-7291-4569-98B2-38FAB74E8B5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B4AAE9F-7291-4569-98B2-38FAB74E8B5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B4AAE9F-7291-4569-98B2-38FAB74E8B5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
