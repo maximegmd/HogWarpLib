@@ -106,8 +106,7 @@ namespace HogWarp.Lib.System
 
         public void Write(ulong value)
         {
-            fixed (Internal* ptr = &_internal)
-                writeVarIntDelegate!(ptr, value);
+            WriteBits(value, 64);
         }
 
         public void Write(double value)

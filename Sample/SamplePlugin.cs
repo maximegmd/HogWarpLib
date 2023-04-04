@@ -42,9 +42,9 @@ namespace Sample
         {
             var reader = new BufferReader(buffer);
 
-            if(opcode == 42)
+            if(opcode == 43)
             {
-                var ping = reader.ReadVarInt();
+                reader.ReadBits(out var ping, 64);
 
                 Console.WriteLine($"Ping: {ping}");
 
