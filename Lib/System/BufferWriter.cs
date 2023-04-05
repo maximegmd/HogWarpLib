@@ -1,5 +1,8 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Numerics;
+using System;
+using System.Runtime.InteropServices;
 using System.Text;
+using SBuffer = System.Buffer;
 
 namespace HogWarp.Lib.System
 {
@@ -86,6 +89,16 @@ namespace HogWarp.Lib.System
                 return writeBitsDelegate!(ptr, value, length);
         }
 
+        public void Write<T>(T value) where T : IBinaryInteger<T>
+        {
+            fixed (Internal* ptr = &_internal)
+            {
+                var data = new byte[value.GetByteCount()];
+                value.WriteLittleEndian(data);
+                Write(data);
+            }
+        }
+
         public bool Write(byte[] data)
         {
             fixed (Internal* ptr = &_internal)
@@ -98,15 +111,16 @@ namespace HogWarp.Lib.System
                 writeBoolDelegate!(ptr, value);
         }
 
+        public void WriteVarInt(ulong value)
+        {
+            fixed (Internal* ptr = &_internal)
+                writeVarIntDelegate!(ptr, value);
+        }
+
         public void Write(float value)
         {
             fixed (Internal* ptr = &_internal)
                 writeFloatDelegate!(ptr, value);
-        }
-
-        public void Write(ulong value)
-        {
-            WriteBits(value, 64);
         }
 
         public void Write(double value)

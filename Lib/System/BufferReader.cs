@@ -1,5 +1,7 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
+using SBuffer = System.Buffer;
 
 namespace HogWarp.Lib.System
 {
@@ -82,37 +84,105 @@ namespace HogWarp.Lib.System
                 return readBytesDelegate!(ptr, data, (ulong)data.LongLength);
         }
 
-        public bool ReadBool()
+        public void Read(out bool value)
         {
             fixed (Internal* ptr = &_internal)
-                return readBoolDelegate!(ptr);
+                value = readBoolDelegate!(ptr);
         }
 
-        public float ReadFloat()
+        public void Read(out byte value)
+        {
+            ReadBits(out var tmp, sizeof(byte) * 8);
+            value = (byte)tmp;
+        }
+
+        public void Read(out ushort value)
+        {
+            ReadBits(out var tmp, sizeof(ushort) * 8);
+            var data = BitConverter.GetBytes((ushort)tmp);
+            if (!BitConverter.IsLittleEndian)
+                Array.Reverse(data);
+
+            value = BitConverter.ToUInt16(data);
+        }
+
+        public void Read(out uint value)
+        {
+            ReadBits(out var tmp, sizeof(uint) * 8);
+            var data = BitConverter.GetBytes((uint)tmp);
+            if (!BitConverter.IsLittleEndian)
+                Array.Reverse(data);
+
+            value = BitConverter.ToUInt32(data);
+        }
+
+        public void Read(out ulong value)
+        {
+            ReadBits(out var tmp, sizeof(ulong) * 8);
+            var data = BitConverter.GetBytes(tmp);
+            if (!BitConverter.IsLittleEndian)
+                Array.Reverse(data);
+
+            value = BitConverter.ToUInt64(data);
+        }
+
+        public void Read(out short value)
+        {
+            ReadBits(out var tmp, sizeof(ushort) * 8);
+            var data = BitConverter.GetBytes((ushort)tmp);
+            if (!BitConverter.IsLittleEndian)
+                Array.Reverse(data);
+
+            value = BitConverter.ToInt16(data);
+        }
+
+        public void Read(out int value)
+        {
+            ReadBits(out var tmp, sizeof(int) * 8);
+            var data = BitConverter.GetBytes((uint)tmp);
+            if (!BitConverter.IsLittleEndian)
+                Array.Reverse(data);
+
+            value = BitConverter.ToInt32(data);
+        }
+
+        public void Read(out long value)
+        {
+            ReadBits(out var tmp, sizeof(long) * 8);
+            var data = BitConverter.GetBytes((ulong)tmp);
+            if (!BitConverter.IsLittleEndian)
+                Array.Reverse(data);
+
+            value = BitConverter.ToInt64(data);
+        }
+
+
+        public void Read(out float value)
         {
             fixed (Internal* ptr = &_internal)
-                return readFloatDelegate!(ptr);
+                value = readFloatDelegate!(ptr);
         }
 
-        public ulong ReadVarInt()
+        public void ReadVarInt(out ulong value)
         {
             fixed (Internal* ptr = &_internal)
-                return readVarIntDelegate!(ptr);
+                value = readVarIntDelegate!(ptr);
         }
 
-        public double ReadDouble()
+        public void ReadDouble(out double value)
         {
             fixed (Internal* ptr = &_internal)
-                return readDoubleDelegate!(ptr);
+                value = readDoubleDelegate!(ptr);
         }
 
-        public string ReadString()
+        public void Read(out string value)
         {
-            var length = ReadVarInt() & 0xFFFF;
+            ReadVarInt(out var length);
+            length &= 0xFFFF;
             var data = new byte[length];
             ReadBytes(data);
 
-            return Encoding.UTF8.GetString(data, 0, data.Length);
+            value = Encoding.UTF8.GetString(data, 0, data.Length);
         }
     }
 }

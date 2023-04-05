@@ -64,33 +64,18 @@ namespace BroomRacing
             {
                 RaceRings currentRace;
 
-                var raceName = reader.ReadString();
-                var raceSize = reader.ReadVarInt();
+                reader.Read(out currentRace.Name);
+                reader.ReadVarInt(out var raceSize);
+                raceSize &= 0xFFFF;
 
-                currentRace.Name = raceName;
                 currentRace.Rings = new FTransform[raceSize - 1];
 
-                int raceRingsIndex = 0;
-
-                foreach(FTransform transform in currentRace.Rings)
+                for (int i = 0; i < currentRace.Rings.Length; ++i)
                 {
-                    FTransform currentTransform;
-
-                    currentTransform.Location.X = reader.ReadFloat();
-                    currentTransform.Location.Y = reader.ReadFloat();
-                    currentTransform.Location.Z = reader.ReadFloat();
-                    currentTransform.Rotation.X = reader.ReadFloat();
-                    currentTransform.Rotation.Y = reader.ReadFloat();
-                    currentTransform.Rotation.Z = reader.ReadFloat();
-                    currentTransform.Scale.X = 1;
-                    currentTransform.Scale.Y = 1;
-                    currentTransform.Scale.Z = 1;
-
-                    currentRace.Rings[raceRingsIndex] = currentTransform;
-                    raceRingsIndex += 1;
+                    reader.Read(out currentRace.Rings[i]);
                 } 
 
-                Console.WriteLine($"Saving Race: {raceName}");
+                Console.WriteLine($"Saving Race: {currentRace.Name}");
                 races.Add(currentRace);
                 SaveRaces();
             }
@@ -100,19 +85,17 @@ namespace BroomRacing
             }
             else if (opcode == 12)
             {
-                var selectedRace = reader.ReadVarInt();
-                SetupRace(player, Convert.ToInt32(selectedRace));
+                reader.Read(out int selectedRace);
+                SetupRace(player, selectedRace);
             }
         }
 
         private void SendRaces(Player player)
         {
-            var buffer = new Buffer(1000);
+            var buffer = new Buffer(10000);
             var writer = new BufferWriter(buffer);
 
-            ulong racesCount = Convert.ToUInt64(races.Count);
-
-            writer.Write(racesCount);
+            writer.WriteVarInt(Convert.ToUInt64(races.Count));
 
             foreach(var race in races)
             {
@@ -157,9 +140,7 @@ namespace BroomRacing
                 raceSetup.Name = race.Name;
 
                 if (raceSetup.Players == null)
-                {
                     raceSetup.Players = new List<Player>();
-                }
 
                 raceSetup.Players.Add(player);
 
