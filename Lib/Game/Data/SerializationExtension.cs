@@ -8,8 +8,8 @@ namespace HogWarp.Lib.Game.Data
             this BufferWriter writer,
             FTransform value)
         {
-            writer.Write(value.Location);
             writer.Write(value.Rotation);
+            writer.Write(value.Location);
             writer.Write(value.Scale);
         }
 
@@ -18,8 +18,8 @@ namespace HogWarp.Lib.Game.Data
             out FTransform value)
         {
             value = new FTransform();
-            reader.Read(out value.Location);
             reader.Read(out value.Rotation);
+            reader.Read(out value.Location);
             reader.Read(out value.Scale);
         }
 
@@ -30,6 +30,7 @@ namespace HogWarp.Lib.Game.Data
             writer.Write(value.X);
             writer.Write(value.Y);
             writer.Write(value.Z);
+            writer.Write(value.W);
         }
 
         public static void Read(
@@ -40,6 +41,7 @@ namespace HogWarp.Lib.Game.Data
             reader.Read(out value.X);
             reader.Read(out value.Y);
             reader.Read(out value.Z);
+            reader.Read(out value.W);
         }
     }
 }
