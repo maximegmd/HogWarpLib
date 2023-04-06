@@ -6,6 +6,7 @@ namespace HogWarp.Lib.Game.Data
     public struct FTransform
     {
         public Vector3 Rotation;
+        public float W;
         public Vector3 Location;
         public Vector3 Scale;
     }

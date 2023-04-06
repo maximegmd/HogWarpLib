@@ -132,7 +132,7 @@ namespace HogWarp.Lib.System
         public void WriteString(string value)
         {
             byte[] utfBytes = Encoding.UTF8.GetBytes(value);
-            Write((ulong)utfBytes.LongLength & 0xFFFF);
+            WriteVarInt((ulong)utfBytes.LongLength & 0xFFFF);
             Write(utfBytes);
         }
     }
