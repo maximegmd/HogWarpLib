@@ -25,9 +25,10 @@ namespace BroomRacing
             public List<Player> Players;
         }
 
-        List<RaceRings> races = new List<RaceRings>();
         public string racesFilePath = "plugins\\BroomRacing\\races.json";
+        public string leaderboardFilePath = "plugins\\BroomRacing\\leaderboards.json";
 
+        List<RaceRings> races = new List<RaceRings>();
         List<RaceSetups> activeRaces = new List<RaceSetups>(); 
 
         public void Initialize(Server server)
@@ -50,7 +51,33 @@ namespace BroomRacing
             {
                 var buffer = new Buffer(2);
                 var writer = new BufferWriter(buffer);
-                _server!.PlayerManager.SendTo(player, Name, 16, writer);
+                _server!.PlayerManager.SendTo(player, Name, 34, writer);
+
+                cancel = true;
+            }
+            else if (message.Contains("/joinrace"))
+            {
+                var split = message.Split("/joinrace ");
+                Console.WriteLine($"Join Race: {split[1]}");
+
+                int raceIndex = races.FindIndex(Race => Race.Name == split[1]);
+
+                if (raceIndex < 0)
+                    Console.WriteLine($"Could not find race");
+                else
+                    SetupRace(player, raceIndex);
+
+                cancel = true;
+            }
+            else if (message == "/startrace")
+            {
+                int activeRaceIndex = activeRaces.FindIndex(Race => Race.Players[0].ToString() == player.ToString());
+
+                if (activeRaceIndex != -1)
+                    SpawnRace(activeRaceIndex);
+                else
+                    Console.WriteLine($"Race not Found / not race Host");
+
                 cancel = true;
             }
             Console.WriteLine($"Chat: {message}");
@@ -60,7 +87,7 @@ namespace BroomRacing
         {
             var reader = new BufferReader(buffer);
 
-            if(opcode == 34)
+            if(opcode == 32)
             {
                 RaceRings currentRace;
 
@@ -79,31 +106,15 @@ namespace BroomRacing
                 races.Add(currentRace);
                 SaveRaces();
             }
-            else if (opcode == 64)
+            else if (opcode == 33)
             {
                 SendRaces(player);
             }
-            else if (opcode == 12)
+            else if (opcode == 34)
             {
                 reader.Read(out int selectedRace);
                 SetupRace(player, selectedRace);
             }
-        }
-
-        private void SendRaces(Player player)
-        {
-            var buffer = new Buffer(10000);
-            var writer = new BufferWriter(buffer);
-
-            writer.WriteVarInt(Convert.ToUInt64(races.Count));
-
-            foreach(var race in races)
-            {
-                writer.WriteString(race.Name);
-            }
-
-            Console.WriteLine($"Sending Races...");
-            _server!.PlayerManager.SendTo(player, Name, 64, writer);
         }
 
         public void LoadRaces()
@@ -124,6 +135,22 @@ namespace BroomRacing
         private void SaveRaces()
         {
             File.WriteAllText(racesFilePath, JsonConvert.SerializeObject(races, Formatting.Indented));
+        }
+
+        private void SendRaces(Player player)
+        {
+            var buffer = new Buffer(10000);
+            var writer = new BufferWriter(buffer);
+
+            writer.WriteVarInt(Convert.ToUInt64(races.Count));
+
+            foreach(var race in races)
+            {
+                writer.WriteString(race.Name);
+            }
+
+            Console.WriteLine($"Sending Races...");
+            _server!.PlayerManager.SendTo(player, Name, 33, writer);
         }
 
         private void SetupRace(Player player, int selectedRace)
@@ -148,8 +175,40 @@ namespace BroomRacing
             }
             else
             {
-                Console.WriteLine($"Race exists, adding player...");
-                activeRaces[raceIndex].Players.Add(player);
+                int playerIndex = activeRaces.FindIndex(Race => Race.Players[0].ToString() == player.ToString());
+
+                if (playerIndex != -1)
+                    Console.WriteLine($"Player already in race");
+                else
+                {
+                    Console.WriteLine($"Race exists, adding player...");
+                    activeRaces[raceIndex].Players.Add(player);
+                }
+            }
+        }
+
+        private void SpawnRace(int activeRaceIndex)
+        {
+            var buffer = new Buffer(10000);
+            var writer = new BufferWriter(buffer);
+
+            int raceIndex = races.FindIndex(Race => Race.Name == activeRaces[activeRaceIndex].Name);
+            var currentRace = races[raceIndex];
+
+            writer.WriteString(races[raceIndex].Name);
+            writer.WriteVarInt(Convert.ToUInt64(races[raceIndex].Rings.Length));
+
+            Console.WriteLine($"Building Race");
+
+            for (int i = 0; i < currentRace.Rings.Length; ++i)
+            {
+                writer.Write(currentRace.Rings[i]);
+            }
+
+            foreach (var racePlayer in activeRaces[activeRaceIndex].Players)
+            {
+                _server!.PlayerManager.SendTo(racePlayer, Name, 32, writer);
+                Console.WriteLine($"Sending {races[raceIndex].Name} to Player with {races[raceIndex].Rings.Length} rings");
             }
         }
     }
