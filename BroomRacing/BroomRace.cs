@@ -111,7 +111,7 @@ namespace BroomRacing
                 reader.ReadVarInt(out var raceSize);
                 raceSize &= 0xFFFF;
 
-                currentRace.Rings = new FTransform[raceSize - 1];
+                currentRace.Rings = new FTransform[raceSize];
 
                 for (int i = 0; i < currentRace.Rings.Length; ++i)
                 {
