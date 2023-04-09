@@ -3,6 +3,7 @@ using HogWarp.Lib.Game;
 using HogWarp.Lib.Game.Data;
 using HogWarp.Lib.System;
 using Newtonsoft.Json;
+using System.Diagnostics;
 using Buffer = HogWarp.Lib.System.Buffer;
 
 namespace BroomRacing
@@ -19,23 +20,32 @@ namespace BroomRacing
             public FTransform[] Rings;
         }
 
+        struct Leaderboard
+        {
+            public string Name;
+            public Dictionary<string, FTimespan> PlayerTime;
+        }
+
         struct RaceSetups
         {
             public string Name;
             public List<Player> Players;
+            public Dictionary<Player, FTimespan> PlayerTimes;
         }
 
         public string racesFilePath = "plugins\\BroomRacing\\races.json";
         public string leaderboardFilePath = "plugins\\BroomRacing\\leaderboards.json";
 
         List<RaceRings> races = new List<RaceRings>();
-        List<RaceSetups> activeRaces = new List<RaceSetups>(); 
+        List<RaceSetups> activeRaces = new List<RaceSetups>();
+        List<Leaderboard> leaderboards = new List<Leaderboard>();
 
         public void Initialize(Server server)
         {
             _server = server;
             _server.UpdateEvent += Update;
             _server.ChatEvent += Chat;
+            _server.PlayerLeaveEvent += PlayerLeave;
             _server.RegisterMessageHandler(Name, HandleMessage);
             LoadRaces();
         }
@@ -43,6 +53,12 @@ namespace BroomRacing
         public void Update(float deltaSeconds)
         {
 
+        }
+
+        public void PlayerLeave(Player player)
+        {
+            Console.WriteLine("Player Left!");
+            // Remove player from all active Races
         }
 
         public void Chat(Player player, string message, ref bool cancel)
@@ -114,6 +130,12 @@ namespace BroomRacing
             {
                 reader.Read(out int selectedRace);
                 SetupRace(player, selectedRace);
+            }
+            else if (opcode == 35)
+            {
+                reader.Read(out string raceName);
+                reader.Read(out FTimespan raceTime);
+                AddRaceTime(player, raceName, raceTime);
             }
         }
 
@@ -209,6 +231,39 @@ namespace BroomRacing
             {
                 _server!.PlayerManager.SendTo(racePlayer, Name, 32, writer);
                 Console.WriteLine($"Sending {races[raceIndex].Name} to Player with {races[raceIndex].Rings.Length} rings");
+            }
+        }
+
+        private void AddRaceTime(Player player, string raceName, FTimespan raceTime)
+        {
+            Console.WriteLine($"Race Index: {raceName}, Race Time: {raceTime.Minutes}:{raceTime.Seconds}:{raceTime.Milliseconds / 10}");
+
+            int activeRaceIndex = activeRaces.FindIndex(ActiveRace => ActiveRace.Name == raceName);
+
+            if (activeRaceIndex != -1)
+            {
+                var raceTimes = activeRaces[activeRaceIndex].PlayerTimes;
+
+                if (raceTimes == null)
+                    raceTimes = new Dictionary<Player, FTimespan>();
+
+                raceTimes.Add(player, raceTime);
+
+                if (activeRaces[activeRaceIndex].Players.Count == raceTimes.Count)
+                {
+                    // End the Race & Print the scores!
+                    Console.WriteLine($"All Players Finished!");
+
+                    var times = raceTimes.OrderByDescending(pair => pair.Value).ToList();
+
+                    foreach (var playerTimes in times)
+                    {
+                        // List Times from Race
+                        Console.WriteLine($"{playerTimes.Key.ToString()} - {playerTimes.Value.Minutes}:{playerTimes.Value.Seconds}:{playerTimes.Value.Milliseconds / 10}");
+                    }
+
+                    activeRaces.RemoveAt(activeRaceIndex);
+                }
             }
         }
     }
