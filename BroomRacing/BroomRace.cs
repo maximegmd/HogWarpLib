@@ -20,12 +20,6 @@ namespace BroomRacing
             public FTransform[] Rings;
         }
 
-        struct Leaderboard
-        {
-            public string Name;
-            public Dictionary<string, FTimespan> PlayerTime;
-        }
-
         struct RaceSetups
         {
             public string Name;
@@ -34,11 +28,9 @@ namespace BroomRacing
         }
 
         public string racesFilePath = "plugins\\BroomRacing\\races.json";
-        public string leaderboardFilePath = "plugins\\BroomRacing\\leaderboards.json";
 
         List<RaceRings> races = new List<RaceRings>();
         List<RaceSetups> activeRaces = new List<RaceSetups>();
-        List<Leaderboard> leaderboards = new List<Leaderboard>();
 
         public void Initialize(Server server)
         {
@@ -79,7 +71,7 @@ namespace BroomRacing
                 int raceIndex = races.FindIndex(Race => Race.Name == split[1]);
 
                 if (raceIndex < 0)
-                    Console.WriteLine($"Could not find race");
+                    player.SendMessage("Could not find race");
                 else
                     SetupRace(player, raceIndex);
 
@@ -87,12 +79,12 @@ namespace BroomRacing
             }
             else if (message == "/startrace")
             {
-                int activeRaceIndex = activeRaces.FindIndex(Race => Race.Players[0].ToString() == player.ToString());
+                int activeRaceIndex = activeRaces.FindIndex(Race => Race.Players[0].DiscordId == player.DiscordId);
 
                 if (activeRaceIndex != -1)
                     SpawnRace(activeRaceIndex);
                 else
-                    Console.WriteLine($"Race not Found / not race Host");
+                    player.SendMessage("Race not found, or you are not the race host.");
 
                 cancel = true;
             }
@@ -194,17 +186,29 @@ namespace BroomRacing
                 raceSetup.Players.Add(player);
 
                 activeRaces.Add(raceSetup);
+
+                foreach (var serverPlayer in _server!.PlayerManager.Players)
+                {
+                    if (serverPlayer.DiscordId == player.DiscordId)
+                        serverPlayer.SendMessage($"You are race Host type '/startrace' to begin.");
+                    else
+                        serverPlayer.SendMessage($"{race.Name} has been setup, type '/joinrace {race.Name}' to join.");
+                }
             }
             else
             {
-                int playerIndex = activeRaces.FindIndex(Race => Race.Players[0].ToString() == player.ToString());
+                int playerIndex = activeRaces.FindIndex(Race => Race.Players[0].DiscordId == player.DiscordId);
 
                 if (playerIndex != -1)
-                    Console.WriteLine($"Player already in race");
+                    player.SendMessage("You are already in this race.");
                 else
                 {
                     Console.WriteLine($"Race exists, adding player...");
                     activeRaces[raceIndex].Players.Add(player);
+                    foreach(var racePlayer in activeRaces[raceIndex].Players)
+                    {
+                        racePlayer.SendMessage($"{player.Name} has joined the race.");
+                    }
                 }
             }
         }
@@ -251,17 +255,16 @@ namespace BroomRacing
 
                 if (activeRaces[activeRaceIndex].Players.Count == raceTimes.Count)
                 {
-                    // End the Race & Print the scores!
-                    Console.WriteLine($"All Players Finished!");
-
                     var times = raceTimes.OrderByDescending(pair => pair.Value).ToList();
 
-                    foreach (var playerTimes in times)
+                    foreach (var racePlayer in activeRaces[activeRaceIndex].Players)
                     {
-                        // List Times from Race
-                        Console.WriteLine($"{playerTimes.Key.ToString()} - {playerTimes.Value.Minutes}:{playerTimes.Value.Seconds}:{playerTimes.Value.Milliseconds / 10}");
+                        racePlayer.SendMessage("Race Times");
+                        foreach (var playerTimes in times)
+                        {
+                            racePlayer.SendMessage($"{playerTimes.Key.Name} - {playerTimes.Value.Minutes}:{playerTimes.Value.Seconds}:{playerTimes.Value.Milliseconds / 10}");
+                        }
                     }
-
                     activeRaces.RemoveAt(activeRaceIndex);
                 }
             }
