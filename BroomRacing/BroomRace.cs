@@ -27,7 +27,7 @@ namespace BroomRacing
             public Dictionary<Player, FTimespan> PlayerTimes;
         }
 
-        public string racesFilePath = "plugins\\BroomRacing\\races.json";
+        public string racesFilePath = Path.Join("plugins", "BroomRacing", "races.json");
 
         List<RaceRings> races = new List<RaceRings>();
         List<RaceSetups> activeRaces = new List<RaceSetups>();
