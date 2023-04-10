@@ -43,5 +43,28 @@ namespace HogWarp.Lib.Game.Data
             reader.Read(out value.Y);
             reader.Read(out value.Z);
         }
+
+        public static void Write(
+            this BufferWriter writer,
+            FTimespan value)
+        {
+            writer.Write(value.Days);
+            writer.Write(value.Hours);
+            writer.Write(value.Minutes);
+            writer.Write(value.Seconds);
+            writer.Write(value.Milliseconds);
+        }
+
+        public static void Read(
+            this BufferReader reader,
+            out FTimespan value)
+        {
+            value = new FTimespan();
+            reader.Read(out value.Days);
+            reader.Read(out value.Hours);
+            reader.Read(out value.Minutes);
+            reader.Read(out value.Seconds);
+            reader.Read(out value.Milliseconds);
+        }
     }
 }
