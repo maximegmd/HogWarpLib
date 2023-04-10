@@ -7,10 +7,10 @@ namespace HogWarp.Lib.Game
     public unsafe partial class Player : Character
     {
         [Function]
-        private partial string GetDiscordId();
+        private partial nint GetDiscordId();
 
         [Function]
-        private partial string GetName();
+        private partial nint GetName();
 
         [Function]
         public partial void Kick();
@@ -24,8 +24,8 @@ namespace HogWarp.Lib.Game
         internal Player(IntPtr Address)
             : base(Address)
         {
-            DiscordId = GetDiscordId();
-            Name = GetName();
+            DiscordId = Marshal.PtrToStringUTF8(GetDiscordId())!;
+            Name = Marshal.PtrToStringUTF8(GetName())!;
         }
 
         public void SendMessage(string data)
