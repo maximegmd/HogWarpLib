@@ -3,7 +3,6 @@ using HogWarp.Lib.Game;
 using HogWarp.Lib.Game.Data;
 using HogWarp.Lib.System;
 using Newtonsoft.Json;
-using System.Diagnostics;
 using Buffer = HogWarp.Lib.System.Buffer;
 
 namespace BroomRacing
@@ -44,13 +43,23 @@ namespace BroomRacing
 
         public void Update(float deltaSeconds)
         {
-
+            
         }
 
         public void PlayerLeave(Player player)
         {
             Console.WriteLine("Player Left!");
-            // Remove player from all active Races
+            foreach (var r in activeRaces)
+            {
+                foreach (var p in r.Players)
+                {
+                    if(p.DiscordId == player.DiscordId)
+                    {
+                        r.Players.Remove(p);
+                        break;
+                    }
+                }
+            }
         }
 
         public void Chat(Player player, string message, ref bool cancel)
