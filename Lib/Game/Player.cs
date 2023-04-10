@@ -1,4 +1,6 @@
 ﻿using HogWarp.Lib.Interop.Attributes;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace HogWarp.Lib.Game
 {
@@ -13,6 +15,9 @@ namespace HogWarp.Lib.Game
         [Function]
         public partial void Kick();
 
+        [Function(Generate = false)]
+        private partial void SendMessage(byte[] data, ulong length);
+
         public string DiscordId { get; private set; }
         public string Name { get; private set; }
 
@@ -21,6 +26,17 @@ namespace HogWarp.Lib.Game
         {
             DiscordId = GetDiscordId();
             Name = GetName();
+        }
+
+        public void SendMessage(string data)
+        {
+            var d = Encoding.UTF8.GetBytes(data);
+            SendMessage(d, (ulong)d.Length);
+        }
+
+        private partial void SendMessage(byte[] data, ulong length)
+        {
+            SendMessageInternal((IntPtr)Address, data, length);
         }
     }
 }

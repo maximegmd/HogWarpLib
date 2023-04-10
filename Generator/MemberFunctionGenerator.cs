@@ -1,4 +1,5 @@
 ﻿using LanguageExt;
+using LanguageExt.UnsafeValueAccess;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -78,6 +79,8 @@ namespace HogWarp.Generator
                 builder.AppendLine("#pragma warning restore CS0649");
                 builder.AppendLine("");
 
+                
+
                 foreach (var f in data.Functions)
                 {
                     builder.AppendLine("[UnmanagedFunctionPointer(CallingConvention.ThisCall)]");
@@ -93,7 +96,7 @@ namespace HogWarp.Generator
                         if (p.Type.Name == "String")
                             func += "[MarshalAs(UnmanagedType.LPUTF8Str)] ";
 
-                        func += p.Type.Name + " " + p.Name;
+                        func += p.OriginalDefinition;
                     }
                     func = func + ");";
 
@@ -115,6 +118,22 @@ namespace HogWarp.Generator
 
                 foreach (var f in data.Functions)
                 {
+                    var attributes = f.GetAttributes();
+                    var attribute = attributes.
+                    Find(
+                        (attribute) => {
+                            var type = attribute.AttributeClass?.ToString();
+                            return type == AttributeName;
+                            }
+                        );
+
+                    var args = ((AttributeData)attribute).NamedArguments;
+                    var generateAttribute = args.Find((pair) => pair.Key == "Generate");
+                    if(generateAttribute.IsSome && (bool)generateAttribute.Value().Value.Value! == false)
+                    {
+                        continue;
+                    }
+
                     string accessibility = "";
                     switch(f.DeclaredAccessibility)
                     {
