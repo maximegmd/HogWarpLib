@@ -47,13 +47,24 @@ namespace BroomRacing
 
         public void Update(float deltaSeconds)
         {
-
+            
         }
 
         public void PlayerLeave(Player player)
         {
             _server!.Information("Player Left!");
             // Remove player from all active Races
+            foreach (var r in activeRaces)
+            {
+                foreach (var p in r.Players)
+                {
+                    if(p.DiscordId == player.DiscordId)
+                    {
+                        r.Players.Remove(p);
+                        break;
+                    }
+                }
+            }
         }
 
         public void Chat(Player player, string message, ref bool cancel)
