@@ -17,7 +17,6 @@ namespace HogWarp.Lib
     {
         public readonly World World;
         public readonly PlayerManager PlayerManager;
-        public readonly ILogger Log;
 
         public event UpdateDelegate? UpdateEvent;
         public event ShutdownDelegate? ShutdownEvent;
@@ -29,7 +28,7 @@ namespace HogWarp.Lib
 
         internal Server(World world, PlayerManager playerManager)
         {
-            Log = Serilog.Log.Logger = new LoggerConfiguration()
+            Serilog.Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()
                 .WriteTo.File("logs/scripting.log").CreateLogger();
 
@@ -47,6 +46,31 @@ namespace HogWarp.Lib
             }
 
             handlers.Add(messageDelegate);
+        }
+
+        public void Debug(string message)
+        {
+            Serilog.Log.Debug(message);
+        }
+
+        public void Information(string message)
+        {
+            Serilog.Log.Information(message);
+        }
+
+        public void Warning(string message)
+        {
+            Serilog.Log.Warning(message);
+        }
+
+        public void Error(string message)
+        {
+            Serilog.Log.Error(message);
+        }
+
+        public void Fatal(string message)
+        {
+            Serilog.Log.Fatal(message);
         }
 
         public void UnregisterMessageHandler(string modName, MessageDelegate messageDelegate)

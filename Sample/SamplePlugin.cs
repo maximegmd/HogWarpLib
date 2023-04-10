@@ -28,12 +28,12 @@ namespace Sample
 
         public void Chat(Player player, string message, ref bool cancel)
         {
-            Console.WriteLine($"Chat: {message}");
+            Serilog.Log.Information($"Chat: {message}");
         }
 
         public void PlayerJoin(Player player)
         {
-            Console.WriteLine("Player joined!");
+            Serilog.Log.Information("Player joined!");
 
             SendPing(player, 0);
         }
@@ -46,7 +46,7 @@ namespace Sample
             {
                 reader.ReadBits(out var ping, 64);
 
-                Console.WriteLine($"Ping: {ping}");
+                Serilog.Log.Information($"Ping: {ping}");
 
                 SendPing(player, ping);
             }

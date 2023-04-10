@@ -3,7 +3,6 @@ using HogWarp.Lib.Game;
 using HogWarp.Lib.Game.Data;
 using HogWarp.Lib.System;
 using Newtonsoft.Json;
-using System.Diagnostics;
 using Buffer = HogWarp.Lib.System.Buffer;
 
 namespace BroomRacing
@@ -22,9 +21,13 @@ namespace BroomRacing
 
         struct RaceSetups
         {
-            public string Name;
-            public List<Player> Players;
-            public Dictionary<Player, FTimespan> PlayerTimes;
+            public string Name = "";
+            public List<Player> Players = new List<Player>();
+            public Dictionary<Player, FTimespan> PlayerTimes = new Dictionary<Player, FTimespan>();
+
+            public RaceSetups()
+            {
+            }
         }
 
         public string racesFilePath = Path.Join("plugins", "BroomRacing", "races.json");
@@ -49,7 +52,7 @@ namespace BroomRacing
 
         public void PlayerLeave(Player player)
         {
-            Console.WriteLine("Player Left!");
+            _server!.Information("Player Left!");
             // Remove player from all active Races
         }
 
@@ -66,7 +69,7 @@ namespace BroomRacing
             else if (message.Contains("/joinrace"))
             {
                 var split = message.Split("/joinrace ");
-                Console.WriteLine($"Join Race: {split[1]}");
+                _server!.Information($"Join Race: {split[1]}");
 
                 int raceIndex = races.FindIndex(Race => Race.Name == split[1]);
 
@@ -88,7 +91,7 @@ namespace BroomRacing
 
                 cancel = true;
             }
-            Console.WriteLine($"Chat: {message}");
+            _server!.Information($"Chat: {message}");
         }
 
         public void HandleMessage(Player player, ushort opcode, Buffer buffer)
@@ -110,7 +113,7 @@ namespace BroomRacing
                     reader.Read(out currentRace.Rings[i]);
                 } 
 
-                Console.WriteLine($"Saving Race: {currentRace.Name}");
+                _server!.Information($"Saving Race: {currentRace.Name}");
                 races.Add(currentRace);
                 SaveRaces();
             }
@@ -133,16 +136,16 @@ namespace BroomRacing
 
         public void LoadRaces()
         {
-            Console.WriteLine("Loading Races...");
+            _server!.Information("Loading Races...");
 
             if (File.Exists(racesFilePath))
             {
                 races = JsonConvert.DeserializeObject<List<RaceRings>>(File.ReadAllText(racesFilePath))!;
-                Console.WriteLine($"Loaded {races.Count} races");
+                _server!.Information($"Loaded {races.Count} races");
             }
             else
             {
-                Console.WriteLine("No races exist!");
+                _server!.Warning("No races exist!");
             }
         }
 
@@ -163,7 +166,7 @@ namespace BroomRacing
                 writer.WriteString(race.Name);
             }
 
-            Console.WriteLine($"Sending Races...");
+            _server!.Information($"Sending Races...");
             _server!.PlayerManager.SendTo(player, Name, 33, writer);
         }
 
@@ -171,7 +174,7 @@ namespace BroomRacing
         {
             var race = races[selectedRace];
 
-            Console.WriteLine($"Setting up Race: {race.Name}");
+            _server!.Information($"Setting up Race: {race.Name}");
 
             int raceIndex = activeRaces.FindIndex(ActiveRace => ActiveRace.Name == race.Name);
 
@@ -179,10 +182,6 @@ namespace BroomRacing
             {
                 RaceSetups raceSetup = new RaceSetups();
                 raceSetup.Name = race.Name;
-
-                if (raceSetup.Players == null)
-                    raceSetup.Players = new List<Player>();
-
                 raceSetup.Players.Add(player);
 
                 activeRaces.Add(raceSetup);
@@ -203,7 +202,7 @@ namespace BroomRacing
                     player.SendMessage("You are already in this race.");
                 else
                 {
-                    Console.WriteLine($"Race exists, adding player...");
+                    _server!.Information($"Race exists, adding player...");
                     activeRaces[raceIndex].Players.Add(player);
                     foreach(var racePlayer in activeRaces[raceIndex].Players)
                     {
@@ -224,7 +223,7 @@ namespace BroomRacing
             writer.WriteString(races[raceIndex].Name);
             writer.WriteVarInt(Convert.ToUInt64(races[raceIndex].Rings.Length));
 
-            Console.WriteLine($"Building Race");
+            _server!.Information($"Building Race");
 
             for (int i = 0; i < currentRace.Rings.Length; ++i)
             {
@@ -234,13 +233,13 @@ namespace BroomRacing
             foreach (var racePlayer in activeRaces[activeRaceIndex].Players)
             {
                 _server!.PlayerManager.SendTo(racePlayer, Name, 32, writer);
-                Console.WriteLine($"Sending {races[raceIndex].Name} to Player with {races[raceIndex].Rings.Length} rings");
+                _server!.Information($"Sending {races[raceIndex].Name} to Player with {races[raceIndex].Rings.Length} rings");
             }
         }
 
         private void AddRaceTime(Player player, string raceName, FTimespan raceTime)
         {
-            Console.WriteLine($"Race Index: {raceName}, Race Time: {raceTime.Minutes}:{raceTime.Seconds}:{raceTime.Milliseconds / 10}");
+            _server!.Information($"Race Index: {raceName}, Race Time: {raceTime.Minutes}:{raceTime.Seconds}:{raceTime.Milliseconds / 10}");
 
             int activeRaceIndex = activeRaces.FindIndex(ActiveRace => ActiveRace.Name == raceName);
 
