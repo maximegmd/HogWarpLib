@@ -81,6 +81,9 @@ namespace HogWarp.Generator
                 foreach (var f in data.Functions)
                 {
                     builder.AppendLine("[UnmanagedFunctionPointer(CallingConvention.ThisCall)]");
+                    if (f.ReturnType.OriginalDefinition.ToString() == "string")
+                        builder.AppendLines("[return: MarshalAs(UnmanagedType.LPStr)]");
+
                     var func = $"internal delegate {f.ReturnType.OriginalDefinition} {f.Name}Delegate(IntPtr This";
 
                     foreach(var p in f.Parameters)

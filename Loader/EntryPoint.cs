@@ -45,21 +45,27 @@ namespace HogWarp.Loader
         [UnmanagedCallersOnly]
         public static void OnPlayerJoined(PlayerArgs args)
         {
-            _server!.OnPlayerJoin(new Player(args.Ptr));
+            var player = new Player(args.Ptr);
+            _server!.PlayerManager.Add(player);
+
+            _server!.OnPlayerJoin(player);
         }
 
         [UnmanagedCallersOnly]
         public static void OnPlayerLeft(PlayerArgs args)
         {
-            _server!.OnPlayerLeave(new Player(args.Ptr));
+            var player = _server!.PlayerManager.Remove(args.Ptr);
+            if(player != null)
+                _server!.OnPlayerLeave(player!);
         }
 
         [UnmanagedCallersOnly]
         public static int OnPlayerChat(ChatArgs args)
         {
             string message = Marshal.PtrToStringUTF8(args.Message)!;
+            var player = _server!.PlayerManager.GetByPtr(args.Ptr)!;
 
-            _server!.OnChat(new Player(args.Ptr), message, out var cancel);
+            _server!.OnChat(player, message, out var cancel);
 
             return cancel ? 1 : 0;
         }
@@ -70,8 +76,9 @@ namespace HogWarp.Loader
             string modName = Marshal.PtrToStringUTF8(args.Plugin)!;
 
             var buffer = Lib.System.Buffer.FromAddress(args.Message);
+            var player = _server!.PlayerManager.GetByPtr(args.Ptr)!;
 
-            _server!.OnMessage(new Player(args.Ptr), modName, args.Opcode, buffer);
+            _server!.OnMessage(player, modName, args.Opcode, buffer);
         }
     }
 }
