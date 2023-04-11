@@ -256,12 +256,8 @@ namespace BroomRacing
 
             if (activeRaceIndex != -1)
             {
+                activeRaces[activeRaceIndex].PlayerTimes.Add(player, raceTime);
                 var raceTimes = activeRaces[activeRaceIndex].PlayerTimes;
-
-                if (raceTimes == null)
-                    raceTimes = new Dictionary<Player, FTimespan>();
-
-                raceTimes.Add(player, raceTime);
 
                 if (activeRaces[activeRaceIndex].Players.Count == raceTimes.Count)
                 {
