@@ -108,7 +108,6 @@ namespace BroomRacing
 
                 cancel = true;
             }
-            _server!.Information($"Chat: {message}");
         }
 
         public void HandleMessage(Player player, ushort opcode, Buffer buffer)
