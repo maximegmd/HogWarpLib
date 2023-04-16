@@ -77,9 +77,15 @@ namespace BroomRacing
 
                 cancel = true;
             }
-            else if (message.Contains("/joinrace"))
+            else if (message.StartsWith("/joinrace"))
             {
                 var split = message.Split("/joinrace ");
+                if(split.Length < 2)
+                {
+                    player.SendMessage("Missing race name! /joinrace <race name>");
+                    cancel = true;
+                    return;
+                }
                 _server!.Information($"Join Race: {split[1]}");
 
                 int raceIndex = races.FindIndex(Race => Race.Name == split[1]);
