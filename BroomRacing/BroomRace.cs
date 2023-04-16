@@ -261,7 +261,11 @@ namespace BroomRacing
 
                 if (activeRaces[activeRaceIndex].Players.Count == raceTimes.Count)
                 {
-                    var times = raceTimes.OrderByDescending(pair => pair.Value).ToList();
+                    var times = raceTimes.OrderBy(pair => pair.Value.Days)
+                        .ThenBy(pair => pair.Value.Hours)
+                        .ThenBy(pair => pair.Value.Minutes)
+                        .ThenBy(pair => pair.Value.Seconds)
+                        .ThenBy(pair => pair.Value.Milliseconds).ToList();
 
                     foreach (var racePlayer in activeRaces[activeRaceIndex].Players)
                     {
