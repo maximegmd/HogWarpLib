@@ -83,35 +83,114 @@ namespace HogWarp.Lib
 
         internal void OnUpdate(float deltaSeconds)
         {
-            UpdateEvent?.Invoke(deltaSeconds);
+            if (UpdateEvent == null)
+                return;
+
+            foreach (UpdateDelegate handler in UpdateEvent!.GetInvocationList())
+            {
+                try
+                {
+                    handler?.Invoke(deltaSeconds);
+                }
+                catch (Exception ex)
+                {
+                    Warning(ex.ToString());
+                }
+            }
         }
 
         internal void OnShutdown()
         {
-            ShutdownEvent?.Invoke();
+            if (ShutdownEvent == null)
+                return;
+
+            foreach (ShutdownDelegate handler in ShutdownEvent!.GetInvocationList())
+            {
+                try
+                {
+                    handler?.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    Warning(ex.ToString());
+                }
+            }
         }
 
         internal void OnPlayerJoin(Player player)
         {
-            PlayerJoinEvent?.Invoke(player);
+            if (PlayerJoinEvent == null)
+                return;
+
+            foreach (PlayerJoinDelegate handler in PlayerJoinEvent!.GetInvocationList())
+            {
+                try
+                {
+                    handler?.Invoke(player);
+                }
+                catch (Exception ex)
+                {
+                    Warning(ex.ToString());
+                }
+            }
         }
 
         internal void OnPlayerLeave(Player player)
         {
-            PlayerLeaveEvent?.Invoke(player);
+            if (PlayerLeaveEvent == null)
+                return;
+
+            foreach (PlayerLeaveDelegate handler in PlayerLeaveEvent!.GetInvocationList())
+            {
+                try
+                {
+                    handler?.Invoke(player);
+                }
+                catch (Exception ex)
+                {
+                    Warning(ex.ToString());
+                }
+            }
+
         }
 
         internal void OnChat(Player player, string message, out bool cancel)
         {
             cancel = false;
-            ChatEvent?.Invoke(player, message, ref cancel);
+
+            if (ChatEvent == null)
+                return;
+
+            
+            foreach (ChatDelegate handler in ChatEvent!.GetInvocationList())
+            {
+                try
+                {
+                    handler?.Invoke(player, message, ref cancel);
+                }
+                catch (Exception ex)
+                {
+                    Warning(ex.ToString());
+                }
+            }
         }
 
         internal void OnMessage(Player player, string modName, ushort opcode, Lib.System.Buffer buffer)
         {
             if (_messageHandlers.TryGetValue(modName, out var handlers))
+            {
                 foreach (var h in handlers)
-                    h.Invoke(player, opcode, buffer);
+                {
+                    try
+                    {
+                        h.Invoke(player, opcode, buffer);
+                    }
+                    catch (Exception ex)
+                    {
+                        Warning(ex.ToString());
+                    }
+                }
+            }
         }
     }
 }
