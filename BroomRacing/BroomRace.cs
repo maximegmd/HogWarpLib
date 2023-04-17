@@ -38,16 +38,10 @@ namespace BroomRacing
         public void Initialize(Server server)
         {
             _server = server;
-            _server.UpdateEvent += Update;
             _server.ChatEvent += Chat;
             _server.PlayerLeaveEvent += PlayerLeave;
             _server.RegisterMessageHandler(Name, HandleMessage);
             LoadRaces();
-        }
-
-        public void Update(float deltaSeconds)
-        {
-            
         }
 
         public void PlayerLeave(Player player)
@@ -122,16 +116,21 @@ namespace BroomRacing
                 reader.ReadVarInt(out var raceSize);
                 raceSize &= 0xFFFF;
 
-                currentRace.Rings = new FTransform[raceSize];
-
-                for (int i = 0; i < currentRace.Rings.Length; ++i)
+                if (raceSize > 0)
                 {
-                    reader.Read(out currentRace.Rings[i]);
-                } 
+                    currentRace.Rings = new FTransform[raceSize];
 
-                _server!.Information($"Saving Race: {currentRace.Name}");
-                races.Add(currentRace);
-                SaveRaces();
+                    for (int i = 0; i < currentRace.Rings.Length; ++i)
+                    {
+                        reader.Read(out currentRace.Rings[i]);
+                    }
+
+                    _server!.Information($"Saving Race: {currentRace.Name}");
+                    races.Add(currentRace);
+                    SaveRaces();
+                }
+                else
+                    player.SendMessage($"Race failed to save, no race rings present.");
             }
             else if (opcode == 33)
             {
