@@ -249,7 +249,7 @@ namespace BroomRacing
             }
             else
             {
-                int playerIndex = activeRaces.FindIndex(Race => Race.Players[0].DiscordId == player.DiscordId);
+                int playerIndex = activeRaces[raceIndex].Players.FindIndex(p => p.DiscordId == player.DiscordId);
 
                 if (playerIndex != -1)
                     player.SendMessage("You are already in this race.");
