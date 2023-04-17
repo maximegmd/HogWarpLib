@@ -31,7 +31,9 @@ namespace BroomRacing
         }
 
         public string racesFilePath = Path.Join("plugins", "BroomRacing", "races.json");
+        public string adminsFilePath = Path.Join("plugins", "BroomRacing", "admins.json");
 
+        List<string> admins = new List<string>();
         List<RaceRings> races = new List<RaceRings>();
         List<RaceSetups> activeRaces = new List<RaceSetups>();
 
@@ -42,6 +44,7 @@ namespace BroomRacing
             _server.PlayerLeaveEvent += PlayerLeave;
             _server.RegisterMessageHandler(Name, HandleMessage);
             LoadRaces();
+            LoadAdmins();
         }
 
         public void PlayerLeave(Player player)
@@ -147,6 +150,11 @@ namespace BroomRacing
                 reader.Read(out FTimespan raceTime);
                 AddRaceTime(player, raceName, raceTime);
             }
+            else if (opcode == 36)
+            {
+                reader.Read(out int selectedRace);
+                DeleteRace(player, selectedRace);
+            }
         }
 
         public void LoadRaces()
@@ -164,6 +172,20 @@ namespace BroomRacing
             }
         }
 
+        public void LoadAdmins()
+        {
+            _server!.Information("Loading Admins...");
+
+            if (File.Exists(adminsFilePath))
+            {
+                admins = JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(adminsFilePath))!;
+                _server!.Information("Loaded Admins");
+            }
+                
+            else
+                _server!.Warning("No admins exist!");
+        }
+
         private void SaveRaces()
         {
             File.WriteAllText(racesFilePath, JsonConvert.SerializeObject(races, Formatting.Indented));
@@ -173,7 +195,12 @@ namespace BroomRacing
         {
             var buffer = new Buffer(10000);
             var writer = new BufferWriter(buffer);
+            var isAdmin = false;
 
+            if (admins.Contains(player.DiscordId))
+                isAdmin = true;
+
+            writer.Write(isAdmin);
             writer.WriteVarInt(Convert.ToUInt64(races.Count));
 
             foreach(var race in races)
@@ -183,6 +210,17 @@ namespace BroomRacing
 
             _server!.Information($"Sending Races...");
             _server!.PlayerManager.SendTo(player, Name, 33, writer);
+        }
+
+        private void DeleteRace(Player player, int selectedRace)
+        {
+            // just double check they are an admin, just in-case...
+            if (admins.Contains(player.DiscordId))
+            {
+                _server!.Information($"Race: {races[selectedRace].Name} deleted");
+                races.RemoveAt(selectedRace);
+                SaveRaces();
+            }
         }
 
         private void SetupRace(Player player, int selectedRace)
