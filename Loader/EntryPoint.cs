@@ -24,7 +24,8 @@ namespace HogWarp.Loader
             var playerManager = new PlayerManager(Params.PlayerManagerAddress);
 
             _server = new Server(world, playerManager);
-
+            
+            if (!System.IO.Directory.Exists("plugins")) System.IO.Directory.CreateDirectory("plugins");
             LoadFromBase("plugins");
 
             InitializePlugins(_server);
